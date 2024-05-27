@@ -2,14 +2,19 @@ package com.aluracursos.foro_hub.domain.author;
 
 import com.aluracursos.foro_hub.domain.comment.Comment;
 import com.aluracursos.foro_hub.domain.profile.Profile;
+import com.aluracursos.foro_hub.domain.profile.ProfileCreationData;
 import com.aluracursos.foro_hub.domain.topic.Topic;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.token.Sha512DigestUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Table(name = "authors")
@@ -17,7 +22,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Author {
+public class Author implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,9 +43,11 @@ public class Author {
 
 
     public Author( AuthorRegisterData data ) {
-        this.name = data.name();
-        this.email = data.email();
-        this.password = Sha512DigestUtils.shaHex( data.password() ) ;
+        name = data.name();
+        email = data.email();
+        var encoder = new BCryptPasswordEncoder();
+        password =  encoder.encode( data.password());
+        profiles.add( new Profile(this, new ProfileCreationData( name ) ) );
     }
 
     public void addTopics(Topic topic){ topics.add(topic); }
@@ -49,4 +56,14 @@ public class Author {
 
     public void addComment(Comment comment){ comments.add(comment); }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    public String getPassword() { return password; }
+
+    @Override
+    public String getUsername() { return email; }
 }

@@ -21,14 +21,14 @@ public class Course {
 
     @Column(unique = true)  private String name;
 
-    private Category category;
+    @Enumerated(EnumType.STRING) private Category category;
 
     @OneToMany(mappedBy = "course",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Topic> topics = new ArrayList<>();
 
-    public Course( CourseCreationData data) {
+    public Course( CourseCreationData data ) {
         this.name = data.name();
-        this.category = data.category();
+        this.category = Category.fromString( data.category() );
     }
 
     public void addTopics(Topic topic){ topics.add(topic); }

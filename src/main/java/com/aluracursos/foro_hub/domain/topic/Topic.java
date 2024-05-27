@@ -7,13 +7,15 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "topics",
-        uniqueConstraints={ @UniqueConstraint(columnNames = {"title", "course"})} )
+        uniqueConstraints={ @UniqueConstraint(columnNames = {"title", "course"}) ,
+                            @UniqueConstraint(columnNames = {"title", "message"})} )
 @Entity(name = "topic")
 @Getter
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class Topic {
     private String title;
     private String message;
     private LocalDateTime created;
-    @Enumerated(EnumType.STRING)  private Status status;
+    @Setter  @Enumerated(EnumType.ORDINAL)  private Status status;
     @ManyToOne private Author author;
     @ManyToOne private Course course;
 
@@ -41,7 +43,10 @@ public class Topic {
         status = Status.ACTIVO;
     }
 
-    public void setStatus(Status status) { this.status = status; }
-
     public void addComment( Comment  comment ) { comments.add(comment); }
+
+    public void update(TopicUpdateData data) {
+        if ( data.title() != null) title = data.title();
+        if ( data.message() != null) message = data.message();
+    }
 }

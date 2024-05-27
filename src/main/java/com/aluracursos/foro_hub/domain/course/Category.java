@@ -9,7 +9,7 @@ public enum Category {
     FASHION,
     VIDEOGAMES;
 
-    public Category fromString(String str){
+    static public Category fromString(String str){
         return Category.valueOf( str.toUpperCase().trim() );
     }
 
