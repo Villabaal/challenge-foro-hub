@@ -5,10 +5,11 @@ import com.aluracursos.foro_hub.domain.author.AuthorRepository;
 import com.aluracursos.foro_hub.domain.course.CourseRepository;
 import com.aluracursos.foro_hub.infra.security.TokenService;
 
+import com.aluracursos.foro_hub.domain.topic.validations.TopicAuthorValidaton;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +18,9 @@ public class TopicService {
     private AuthorRepository userRepo;
     @Autowired private CourseRepository courseRepo;
     @Autowired private TopicRepository topicRepo;
-    @Autowired
-    TokenService tokenService;
+    @Autowired TokenService tokenService;
+    @Autowired TopicAuthorValidaton userValidator;
+
 
     public TopicResponseData topicCreation( TopicCreationData data, String token ) {
         var email = tokenService.getSubject(token);
@@ -30,20 +32,20 @@ public class TopicService {
         return new TopicResponseData(topic);
     }
 
-    public Page<TopicResponseData> topicList(@PageableDefault(size = 2) Pageable pag){
+    public Page<TopicResponseData> topicList(Pageable pag){
         return topicRepo.findByStatusTrue(pag).map(TopicResponseData::new);
     }
 
     public TopicResponseData topicDetail( Long id ){
         var topic = topicRepo.findIfActive(id);
-        if(topic.isEmpty()) throw new RuntimeException(" Inactivo ");
+        if(topic.isEmpty()) throw new EntityNotFoundException(" Inactivo ");
         return new TopicResponseData( topic.get() );
     }
 
     public TopicResponseData topicUpdate(TopicUpdateData data, String token){
         var email = tokenService.getSubject(token);
         var user = (Author) userRepo.findByEmail(email).orElseThrow();
-        var topic = user_validation( user, data.id() );
+        var topic = userValidator.validate( data.id(), user );
         topic.update(data);
         return new TopicResponseData( topic );
     }
@@ -51,15 +53,7 @@ public class TopicService {
     public void topicDeactivate(Long id, String token){
         var email = tokenService.getSubject(token);
         var user = (Author) userRepo.findByEmail(email).orElseThrow();
-        var topic = user_validation( user, id );
+        var topic = userValidator.validate( id, user );
         topic.setStatus( Status.CERRADO );
-        new TopicResponseData(topic);
-    }
-
-    private Topic user_validation(Author user,Long id){
-        var topic = user.getTopics().stream()
-                .filter( t -> t.getId().equals( id ) ).findAny();
-        if(topic.isEmpty()) throw new RuntimeException("Autor no autorizado para cambiar este topico");
-        return topic.get();
     }
 }

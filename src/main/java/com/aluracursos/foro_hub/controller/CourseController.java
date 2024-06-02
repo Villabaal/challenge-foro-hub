@@ -1,16 +1,9 @@
 package com.aluracursos.foro_hub.controller;
 
-import com.aluracursos.foro_hub.domain.author.Author;
-import com.aluracursos.foro_hub.domain.author.AuthorRepository;
-import com.aluracursos.foro_hub.domain.author.AuthorResponseData;
 import com.aluracursos.foro_hub.domain.course.Course;
 import com.aluracursos.foro_hub.domain.course.CourseCreationData;
 import com.aluracursos.foro_hub.domain.course.CourseRepository;
 import com.aluracursos.foro_hub.domain.course.CourseResponseData;
-import com.aluracursos.foro_hub.domain.topic.Topic;
-import com.aluracursos.foro_hub.domain.topic.TopicRepository;
-import com.aluracursos.foro_hub.domain.topic.TopicResponseData;
-import com.aluracursos.foro_hub.domain.topic.TopicCreationData;
 import com.aluracursos.foro_hub.infra.security.TokenService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -37,6 +30,16 @@ public class CourseController {
         return ResponseEntity.created(url).body( responseData );
     }
 
-    //TODO - petición de listado y detalles de cursos
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseResponseData> getCourseData(@PathVariable Long id ){
+        var datos = new CourseResponseData( courseRepo.findById( id ).orElseThrow() );
+        return ResponseEntity.ok(datos);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CourseResponseData>> getCourseListData(@PageableDefault(size = 2) Pageable pag){
+        var datos = courseRepo.findAll(pag).map(CourseResponseData::new);
+        return ResponseEntity.ok( datos );
+    }
 
 }

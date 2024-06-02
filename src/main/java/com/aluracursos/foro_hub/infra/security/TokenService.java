@@ -3,6 +3,7 @@ package com.aluracursos.foro_hub.infra.security;
 import com.aluracursos.foro_hub.domain.author.Author;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class TokenService {
                 .sign(algorithm);
     }
 
-    public String getSubject( String token ){
+    public String getSubject( String token ) throws TokenExpiredException {
         var algorithm = Algorithm.HMAC256( apiSecret );
         var verifier = JWT.require(algorithm)
                 .withIssuer("foro hub")

@@ -29,7 +29,6 @@ public class SecurityConfigurations{
                         "/entrar",
                         "/autores/registrar"
                 ).permitAll().anyRequest().authenticated() )
-                //.requestMatchers("/swagger-ui.html", "/v3/api-docs/**","/swagger-ui/**").permitAll()
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

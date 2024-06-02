@@ -16,4 +16,5 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
             """,nativeQuery = true)
     Optional<Topic> findIfActive(Long id);
 
+    Optional<Topic> findByTitleContainingIgnoreCase(String title);
 }

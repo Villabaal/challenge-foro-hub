@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +21,7 @@ public class Comment {
     private Long id;
     private String message;
     private LocalDateTime created;
-    private Boolean solution;
+    @Setter private Boolean solution = false;
     @ManyToOne private Author author;
     @ManyToOne private Topic topic;
 
@@ -31,7 +32,5 @@ public class Comment {
         created = LocalDateTime.now();
     }
 
-    public void setSolution(Boolean solution) {
-        this.solution = solution;
-    }
+    public void update(CommentUpdateData data){ message = data.message(); }
 }

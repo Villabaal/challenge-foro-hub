@@ -7,6 +7,9 @@ import com.aluracursos.foro_hub.domain.author.AuthorResponseData;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -34,5 +37,9 @@ public class AuthorController {
         return ResponseEntity.ok(datos);
     }
 
-    //TODO - petición de listado
+    @GetMapping
+    public ResponseEntity<Page<AuthorResponseData>> getAuthorListData(@PageableDefault(size = 2) Pageable pag){
+        var datos = repo.findAll(pag).map(AuthorResponseData::new);
+        return ResponseEntity.ok( datos );
+    }
 }

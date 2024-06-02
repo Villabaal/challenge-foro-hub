@@ -25,7 +25,7 @@ public class TopicController {
                                                              @RequestHeader("Authorization") String auth , UriComponentsBuilder uriCompBldr) {
         var token = getToken(auth);
         var responseData = service.topicCreation(data,token);
-        var url = uriCompBldr.path("/cursos/topicos/{id}").buildAndExpand( responseData.id() ).toUri();
+        var url = uriCompBldr.path("/topicos/{id}").buildAndExpand( responseData.id() ).toUri();
         return ResponseEntity.created(url).body(responseData);
     }
 

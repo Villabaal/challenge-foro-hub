@@ -13,9 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "topics",
-        uniqueConstraints={ @UniqueConstraint(columnNames = {"title", "course"}) ,
-                            @UniqueConstraint(columnNames = {"title", "message"})} )
+@Table(name = "topics")
 @Entity(name = "topic")
 @Getter
 @NoArgsConstructor
@@ -24,7 +22,7 @@ public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
+    @Column(unique = true) private String title;
     private String message;
     private LocalDateTime created;
     @Setter  @Enumerated(EnumType.ORDINAL)  private Status status;
